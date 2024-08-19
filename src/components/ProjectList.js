@@ -16,9 +16,6 @@ const ProjectList = () => {
   const navigate = useNavigate();
 
   useEffect( () => {
-    // axios.get(`${process.env.REACT_APP_API_URL}/projects`)
-    //   .then(response => setProjects(response.data))
-    //   .catch(error => console.error('Error fetching projects:', error));
     async function fetchData() {
         try {
             const response = await getProjects()
@@ -39,12 +36,6 @@ const ProjectList = () => {
   }, []);
 
   const handleCreateProject = () => {
-    // axios.post(`${process.env.REACT_APP_API_URL}/projects`, newProject)
-    //   .then(response => {
-    //     setProjects([...projects, response.data]);
-    //     setOpen(false);
-    //   })
-    //   .catch(error => console.error('Error creating project:', error));
     async function makeProject() {
         try {
             const response = await createProject(newProject)

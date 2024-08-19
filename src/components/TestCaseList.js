@@ -42,9 +42,6 @@ const TestCaseList = () => {
       }, [searchQuery, testCases]);
 
     useEffect(() => {
-        // axios.get(`${process.env.REACT_APP_API_URL}/projects/${projectId}/testcases`)
-        //   .then(response => setTestCases(response.data))
-        //   .catch(error => console.error('Error fetching test cases:', error));
         async function fetchData() {
             try {
                 console.log("Porject id ", projectId)
@@ -61,12 +58,6 @@ const TestCaseList = () => {
     }, [projectId]);
 
     const handleCreateTestCase = () => {
-        // axios.post(`${process.env.REACT_APP_API_URL}/projects/${projectId}/testcases`, newTestCase)
-        //   .then(response => {
-        //     setTestCases([...testCases, response.data]);
-        //     setOpen(false);
-        //   })
-        //   .catch(error => console.error('Error creating test case:', error));
         async function createTest() {
             try {
                 const response = await createTestCase(newTestCase);
@@ -103,12 +94,6 @@ const TestCaseList = () => {
     };
 
     const handleEditTestCase = () => {
-        // axios.put(`${process.env.REACT_APP_API_URL}/testcases/${editingTestCase.id}`, editingTestCase)
-        //     .then(() => {
-        //         setTestCases(testCases.map(tc => (tc.id === editingTestCase.id ? editingTestCase : tc)));
-        //         setEditOpen(false);
-        //     })
-        //     .catch(error => console.error('Error updating test case:', error));
 
         async function editTest() {
             try {
@@ -147,7 +132,7 @@ const TestCaseList = () => {
             try {
                 const confirmDelete = window.confirm("Are you sure you want to delete this test case?");
                 if (!confirmDelete) {
-                return;  // If the user clicks "Cancel", exit the function
+                    return; 
                 }
                 const response = await deleteTestCase(id);
                 if(response.data) {
