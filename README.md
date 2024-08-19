@@ -1,70 +1,198 @@
-# Getting Started with Create React App
+# Test Case Management Tool
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project is a Test Case Management Tool with a React frontend, a Spring Boot backend, and a MySQL database. The tool allows users to create, manage, and track test cases for various projects.
 
-## Available Scripts
+## Prerequisites
 
-In the project directory, you can run:
+Ensure that your system has the following installed:
 
-### `npm start`
+- **Java JDK 17 or later**
+    - [Download Link](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+- **Maven**
+    - [Download Link](https://maven.apache.org/install.html)
+- **Node.js and npm (Node Package Manager)**
+    - [Download Link](https://nodejs.org/)
+- **MySQL**
+    - [Download Link](https://dev.mysql.com/downloads/installer/)
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Setup Instructions
 
-### `npm test`
+[Download Frontend by cloning this project](https://github.com/SaurabhPethani/test-case-management-tool-fe/tree/master)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+ or clone using 
+ ```
+ git clone git@github.com:SaurabhPethani/test-case-management-tool-fe.git
+```
+[Download backend by cloning this project](https://github.com/SaurabhPethani/test-case-management-tool/tree/master)
 
-### `npm run build`
+or clone using
+```
+git clone git@github.com:SaurabhPethani/test-case-management-tool.git
+```
+### Backend Setup (Spring Boot)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Navigate to the `test-case-management-tool` directory:**
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+   ```
+    cd test-case-management-tool
+    git checkout master
+    cd test-case-management-backend
+    mvn clean install
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+    - application.properties - change db related properties as per setup
+    spring.application.name=Test Case Management
+    spring.datasource.url=jdbc:mysql://localhost:3306/test_case_management?useSSL=false&serverTimezone=UTC
+    spring.datasource.username=root
+    spring.datasource.password=admin
+    spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+    
+    spring.jpa.hibernate.ddl-auto=update
+    spring.jpa.show-sql=true
+    spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQLDialect
+    
+    allowed.users=saurabh,admin,test
+    
+    jwt.secret.key=thisissecret,NotToExposeAnyone,#SECURE
+    spring.security.user.name=abc
+    spring.security.user.password=1234
+   
+    mvn package
 
-### `npm run eject`
+### Database Setup (MySQL)
+##### Install MySQL:
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Ensure that MySQL is installed on your machine. You can download it from the [MySQL official website](https://dev.mysql.com/downloads/installer/).
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+##### Start MySQL Server:
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Start your MySQL server. This varies depending on your operating system:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+```
+# On Windows
+net start mysql
+- if above command doesnt work then goto run(windows + r) -> type services.msc -> find MySql80 -> right click & start
+# On Linux
+sudo service mysql start
+```
+#### Create the Database:
 
-## Learn More
+Log in to the MySQL shell and create a new database:
+or start mysql workbench & add connection for localhost
+```
+- if not using workbench then start mysql shell in windows
+    navigate to bin folder of mysql directory [in mycase it is C:\Program Files\MySQL\MySQL Server 8.0\bin]
+        open terminal & execute
+        .\mysql -u root -p
+        mysql will prompt for password, enter admin, it will login to mysql shell
+- on linux enter
+    mysql -u root -p
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- execute queries below on terminal or workbench
+CREATE DATABASE test_case_management;
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+CREATE TABLE `test_case_management`.users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(255) NOT NULL UNIQUE,
+    password TEXT NOT NULL,
+    role VARCHAR(255) NOT NULL
+);
 
-### Code Splitting
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+CREATE TABLE test_case_management.projects (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    active BOOLEAN DEFAULT TRUE,
+    name VARCHAR(255) NOT NULL,
+    jira_ticket_id VARCHAR(255) NOT NULL
+);
 
-### Analyzing the Bundle Size
+CREATE TABLE test_case_management.test_cases (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    project_id BIGINT NOT NULL,
+    test_case_id VARCHAR(255) NOT NULL,
+    test_case_name VARCHAR(255) NOT NULL,
+    type VARCHAR(255) NOT NULL,
+    description TEXT NOT NULL,
+    input_data TEXT NOT NULL,
+    expected_result TEXT NOT NULL,
+    actual_result TEXT NOT NULL,
+    status VARCHAR(255) NOT NULL,
+    created_by VARCHAR(255) NOT NULL,
+    FOREIGN KEY (project_id) REFERENCES projects(id) ON DELETE CASCADE
+);
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+INSERT INTO `test_case_management`.`users` (`id`, `username`, `password`, `role`) VALUES (NULL, 'admin', '$2a$10$vDAI3eLNhbCpXRaik7Q.ROyXw1tQUw/I4TYnMbsHKLPauGugY.Go.', 'ROLE_ADMIN');
 
-### Making a Progressive Web App
+```
+### Frontend Setup (React)
+#### Navigate to the test-case-management-tool-fe directory:
+```
+cd test-case-management-tool-fe
+git checkout master
+```
+### Install Node.js dependencies:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Ensure that Node.js and npm are installed. Run the following command to install the dependencies:
 
-### Advanced Configuration
+```
+npm install
+```
+### Configure Environment Variables:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+Create a .env file in the frontend directory and set the environment variables:
 
-### Deployment
+```
+- change ip/port of backend server if needed
+REACT_APP_API_URL=http://localhost:8080/api
+```
+Build the Project:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+You can build the React project for production using:
+```
+npm run build
+```
+### Running the Application
+#### Backend (Spring Boot)
+#### Start the Backend:
 
-### `npm run build` fails to minify
+Run the Spring Boot application:
+```
+navigate to test-case-management-backend directory
+mvn spring-boot:run
+```
+#### The backend should now be running on http://localhost:8080.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+### Frontend (React)
+#### Start the Frontend:
+
+- Run the React development server:
+```
+navigate to test-case-management-tool-fe directory
+npm start
+```
+The frontend should now be running on http://localhost:3000.
+
+- use following credentials to login as admin
+- username: admin
+- password: 1234
+
+#### To add new user fire query below & add username in {allowed.users} application.properties file. Password is encoded with bcrypt encoder.
+-- password is 1234
+INSERT INTO `test_case_management`.`users` (`id`, `username`, `password`, `role`) VALUES (NULL, 'saurabh', '$2a$10$vDAI3eLNhbCpXRaik7Q.ROyXw1tQUw/I4TYnMbsHKLPauGugY.Go.', 'ROLE_TESTER');
+
+### Useful Commands
+#### Backend
+
+#### Build the Project:
+```
+mvn clean install
+
+### Frontend
+#### Run Development Server:
+```
+npm start
+#### Build for Production:
+```
+npm run build
+
+
